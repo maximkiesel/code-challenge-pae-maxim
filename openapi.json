@@ -1,0 +1,146 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Automation Runs API",
+    "version": "1.0.0",
+    "description": "Local API for the Automation Runs frontend code challenge. Data is held only in memory and resets when the server restarts."
+  },
+  "servers": [
+    {
+      "url": "http://127.0.0.1:8080",
+      "description": "Default local server"
+    }
+  ],
+  "paths": {
+    "/health": {
+      "get": {
+        "summary": "Check whether the local server is running",
+        "responses": {
+          "200": {
+            "description": "Server is healthy",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Health" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/automation-runs": {
+      "get": {
+        "summary": "List automation runs",
+        "description": "Filtering, search, and sorting are intentionally implemented in the frontend challenge, not in this API.",
+        "responses": {
+          "200": {
+            "description": "Automation runs, or an empty list in the empty scenario",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": { "$ref": "#/components/schemas/AutomationRun" }
+                }
+              }
+            }
+          },
+          "500": { "$ref": "#/components/responses/ServerError" }
+        }
+      }
+    },
+    "/api/automation-runs/{id}/retry": {
+      "post": {
+        "summary": "Retry a failed automation run",
+        "description": "Only runs with the status `failed` can be retried. A successful retry changes the in-memory status to `running`.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "integer", "minimum": 1 },
+            "description": "Automation run identifier"
+          }
+        ],
+        "responses": {
+          "202": {
+            "description": "Retry was accepted",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/RetryResponse" }
+              }
+            }
+          },
+          "404": { "$ref": "#/components/responses/NotFound" },
+          "409": {
+            "description": "The run is not in the failed state",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Error" }
+              }
+            }
+          },
+          "500": { "$ref": "#/components/responses/ServerError" }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "AutomationRun": {
+        "type": "object",
+        "required": ["id", "name", "application", "status", "created_at", "duration_ms"],
+        "properties": {
+          "id": { "type": "integer", "example": 102 },
+          "name": { "type": "string", "example": "Ticket Classification" },
+          "application": { "type": "string", "example": "Zendesk" },
+          "status": {
+            "type": "string",
+            "enum": ["success", "failed", "running"],
+            "example": "failed"
+          },
+          "created_at": { "type": "string", "format": "date-time", "example": "2026-08-20T09:30:00Z" },
+          "duration_ms": { "type": "integer", "nullable": true, "example": 1730 }
+        }
+      },
+      "RetryResponse": {
+        "type": "object",
+        "required": ["id", "status"],
+        "properties": {
+          "id": { "type": "integer", "example": 102 },
+          "status": { "type": "string", "enum": ["running"], "example": "running" }
+        }
+      },
+      "Health": {
+        "type": "object",
+        "required": ["status"],
+        "properties": {
+          "status": { "type": "string", "example": "ok" }
+        }
+      },
+      "Error": {
+        "type": "object",
+        "required": ["error"],
+        "properties": {
+          "error": { "type": "string", "example": "automation runs could not be loaded" }
+        }
+      }
+    },
+    "responses": {
+      "NotFound": {
+        "description": "Automation run or route was not found",
+        "content": {
+          "application/json": {
+            "schema": { "$ref": "#/components/schemas/Error" }
+          }
+        }
+      },
+      "ServerError": {
+        "description": "The selected scenario simulates a server error",
+        "content": {
+          "application/json": {
+            "schema": { "$ref": "#/components/schemas/Error" }
+          }
+        }
+      }
+    }
+  }
+}
