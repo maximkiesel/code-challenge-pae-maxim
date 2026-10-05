@@ -1,0 +1,50 @@
+<div>
+  <h3>{{ automationRun.name }}</h3>
+  <div>
+    <div>
+      <span>ID: </span>
+      <span>{{ automationRun.id }}</span>
+    </div>
+
+    <div>
+      <span>Application: </span>
+      <span>{{ automationRun.application }}</span>
+    </div>
+
+    <div>
+      <span>Status: </span>
+      <span>{{ automationRun.status }}</span>
+    </div>
+
+    <div>
+      <span>Zeitpunkt: </span>
+      <span>{{ automationRun.created_at }}</span>
+    </div>
+
+    <div>
+      <span>Dauer in ms: </span>
+      <span>{{ automationRun.duration_ms ?? 'null' }}</span>
+    </div>
+  </div>
+
+  @if (automationRun.status === AutomationRunStatus.FAILED) {
+    <div class="card-footer">
+      <button type="button" (click)="retryRun()" [disabled]="isLoading()">
+        @if (isLoading()) {
+          <div class="spinner"></div>
+        } @else {
+          Retry
+        }
+      </button>
+
+      @if (hasFailed()) {
+        <br>
+        <span class="error">
+           Automation run konnte nich gestartet werden.
+        </span>
+
+      }
+    </div>
+  }
+</div>
+

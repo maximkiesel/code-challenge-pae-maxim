@@ -1,0 +1,46 @@
+<div class="dashboard">
+  <br><br><br><br>
+  <button type="button" (click)="loadAutomationRuns()">
+    Neu laden der Automation Runs
+  </button>
+  <br><br>
+  <label for="statusFilter">Filter: </label>
+  <select id="statusFilter" (change)="filterByListByStatus($any($event.target).value || null)">
+    <option value="">All</option>
+    <option [value]="AutomationRunStatus.SUCCESS">Success</option>
+    <option [value]="AutomationRunStatus.FAILED">Failed</option>
+    <option [value]="AutomationRunStatus.RUNNING">Running</option>
+  </select>
+  &nbsp;&nbsp;&nbsp;
+  <label for="sort">Sortieren: </label>
+  <select id="sort" (change)="sortBy($any($event.target).value)">
+    <option value="date-asc">Zeitpunkt ↑</option>
+    <option value="date-desc">Zeitpunkt ↓</option>
+    <option value="duration-asc">Dauer ↑</option>
+    <option value="duration-desc">Dauer ↓</option>
+  </select>
+
+  <br><br>
+
+  @if (isLoading()) {
+    <div class="spinner"></div>
+  } @else {
+    <div>
+      @if(hasFailed()){
+        <span class="error">
+          Request fehlgeschlagen
+        </span>
+      }
+      @else if (automationRuns().length == 0){
+        Keine Automation Runs gefunden
+      }
+      @for (run of automationRuns(); track run.id) {
+        <app-automation-run-card
+          [automationRun]="run"
+          (retrySuccess)="loadAutomationRuns()"
+        ></app-automation-run-card>
+        <br>
+      }
+    </div>
+  }
+</div>
