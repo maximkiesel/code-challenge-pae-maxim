@@ -6,6 +6,6 @@ export interface AutomationRun{
   name:string,
   application:string,
   status:AutomationRunStatus,
-  created_at:string,
+  created_at:Date,
   duration_ms:number|null
 }
