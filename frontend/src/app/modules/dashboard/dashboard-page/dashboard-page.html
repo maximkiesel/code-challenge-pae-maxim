@@ -31,7 +31,7 @@
           Request fehlgeschlagen
         </span>
       }
-      @else if (automationRuns().length == 0){
+      @else if (automationRuns().length === 0){
         Keine Automation Runs gefunden
       }
       @for (run of automationRuns(); track run.id) {

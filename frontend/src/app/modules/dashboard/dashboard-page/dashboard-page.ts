@@ -57,7 +57,7 @@ export class DashboardPage implements OnInit  {
 
   protected filterByListByStatus(status: AutomationRunStatus | null): void {
     this.selectedStatus = status;
-    if(status==null){
+    if(status===null){
       this.automationRuns.set(this.automationRunsBase());
     } else{
       let filtered = this.automationRunsBase().filter(run => run.status == status);
